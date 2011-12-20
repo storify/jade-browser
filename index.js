@@ -14,13 +14,13 @@ module.exports = function(exportPath, patterns, options){
     , ext = options.ext || 'jade'
     , namespace = options.namespace || 'jade'
     , built = false
+    , noCache = options.noCache || false
     , debug = options.debug || false
     , minify = options.minify || false
     , maxAge = options.maxAge || 86400
     , exportPath = exportPath.replace(/\/$/,'')
     , root = options.root ? options.root.replace(/\/$/,'') : __dirname
     , regexp = utils.toRegExp(exportPath, true)
-    , payload = new Expose()
     , headers = {
           'Cache-Control': 'public, max-age=' + maxAge
         , 'Content-Type': 'text/javascript' 
@@ -31,7 +31,7 @@ module.exports = function(exportPath, patterns, options){
        return next();
     }
     
-    if (built) { 
+    if (built && !noCache) {
       res.writeHead(200, headers);
       res.end(built);
     } else {
@@ -67,6 +67,7 @@ module.exports = function(exportPath, patterns, options){
               filename: filename
             , inline: false
             , compileDebug: false
+            , client: true
           });
           
           if (typeof tmpl == 'function') {
@@ -89,9 +90,12 @@ module.exports = function(exportPath, patterns, options){
         results.forEach(function(template) {
           templates[template.filename] = template.fn;
         });
-        
-        var code = jade.runtime.escape.toString() +';'+ jade.runtime.attrs.toString() + '; return attrs(obj);'
 
+        var code = jade.runtime.escape.toString() +';'
+        code += jade.runtime.attrs.toString().replace(/exports\./g, '') + ';'
+        code += ' return attrs(obj);'
+        
+        var payload = new Expose();
         payload.expose({
             attrs: new Function('obj', code)
           , escape: jade.runtime.escape
