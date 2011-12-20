@@ -13,7 +13,7 @@
   "dependencies": {
     "jade": "0.16.4",
     "async": "0.1.12",
-    "glob": "2.0.9",
+    "glob": "2.1.0",
     "uglify-js": "1.0.6"
   },
   "devDependencies": {}
