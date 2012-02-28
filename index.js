@@ -61,12 +61,11 @@ module.exports = function(exportPath, patterns, options){
             return cb(err);
           }
 
-          filename = filename.replace(root + '/', '');
-
           var tmpl = jade.compile(content, {
               filename: filename
             , inline: false
             , compileDebug: false
+            , client: true
           });
           
           if (typeof tmpl == 'function') {
@@ -85,12 +84,15 @@ module.exports = function(exportPath, patterns, options){
       }
 
       function expose(e, results) {
-        var templates = {};
+        var templates = {}, filename;
         results.forEach(function(template) {
-          templates[template.filename] = template.fn;
+          filename = template.filename.replace(root + '/', '')
+          templates[filename] = template.fn;
         });
-        
-        var code = jade.runtime.escape.toString() +';'+ jade.runtime.attrs.toString() + '; return attrs(obj);'
+
+        var code = jade.runtime.escape.toString() +';'
+        code += jade.runtime.attrs.toString().replace(/exports\./g, '') + ';'
+        code += ' return attrs(obj);'
 
         payload.expose({
             attrs: new Function('obj', code)
