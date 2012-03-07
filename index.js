@@ -44,7 +44,7 @@ module.exports = function(exportPath, patterns, options){
       patterns.forEach(function(pattern) {
         pattern = path.join(root, pattern);
         try {
-          var matches = glob.globSync(pattern);
+          var matches = glob.sync(pattern);
           matches = matches.filter(function(match) {
             return match.match(ext + '$');
           });
@@ -69,7 +69,7 @@ module.exports = function(exportPath, patterns, options){
           });
           
           if (typeof tmpl == 'function') {
-            var fn = 'var jade=' + namespace + '; return anonymous(locals);'+ tmpl.toString();
+            var fn = 'var jade=window.' + namespace + '; return anonymous(locals);'+ tmpl.toString();
             fn = new Function('locals', fn);
             
             cb(null, {
