@@ -1,6 +1,7 @@
 # Jade Browser
 
-  Middleware for express/connect to expose jade templates to the web browser. It provides a few additional features like express-like render function with partial handling.
+  Middleware for express/connect and/or static file generator to expose jade templates to the web browser. 
+	It provides a few additional features like express-like render function with partial handling.
   
 ```javascript
 var express = require('express')
@@ -17,6 +18,7 @@ app.use(jade_browser(url_endpoint, template_dir, options));
 ## Features
 
   * Jade templates are served as compiled functions.
+		* either as middleware or pre-cached and served from a public directory
     * removes browser compatibility issues
     * increases speed of template execution
     * reduces file transfer size
@@ -37,7 +39,27 @@ var express = require('express')
   , jade_browser = require('jade-browser')
   , app = express.createServer();
 
-app.use(jade_browser('/js/templates.js', '**', options));
+// use jade-browser as middleware
+app.use(jade_browser.middleware('/js/templates.js', '**', options));
+
+```
+	Or, configure to add static file caching -- with or without express/connect.
+
+```javascript
+var jade_browser = require('jade-browser')
+
+// this will generate a file at this location: staticRoot + '/js/templates.js'
+jade_browser.cache('/js/templates.js', '**', 
+	{root: 'some/directory/with/views', staticRoot: __dirname  + '/public'});
+
+// or, configure the file watcher and add static file caching
+// you'll need to manually create the folder where the files should live
+// to compile, just save one of the files listed in the directory. 
+if (env === 'development') {
+	jade_browser.watch('/js/templates.js', '**', 
+		{root: 'some/directory/with/views', staticRoot: __dirname  + '/public'});
+}
+
 ```
 
 ### Params
@@ -45,12 +67,15 @@ app.use(jade_browser('/js/templates.js', '**', options));
   - `patterns`  A single string or array of patterns used to glob for template files
   - `options`   Options object, see below (optional)
 
+
 #### Options
   - `root`      The root of the views (default: __dirname)
   - `namespace` Namespace for the browser (default: 'jade')
-  - `minify`    Minifies the output (default: false)
+  - `minify`    Minifies the output (default: false; 
+								If enabled and using caching, '-min.js' file is automatically created)
   - `maxAge`    Time in seconds to cache the results (default: 86400)
-  
+  - `cacheRoot` The file system path where compiled templates are placed ()
+
 ### Browser
 
 ```javascript
