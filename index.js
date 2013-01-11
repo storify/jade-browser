@@ -14,6 +14,7 @@ module.exports = function(exportPath, patterns, options){
     , ext = options.ext || 'jade'
     , namespace = options.namespace || 'jade'
     , built = false
+    , amd = options.amd || false
     , debug = options.debug || false
     , minify = options.minify || false
     , maxAge = options.maxAge || 86400
@@ -69,7 +70,8 @@ module.exports = function(exportPath, patterns, options){
           });
           
           if (typeof tmpl == 'function') {
-            var fn = 'var jade=window.' + namespace + '; return anonymous(locals);'+ tmpl.toString();
+            var fn = (options.amd ? 'var jade=amd_': 'var jade=window.') 
+                + namespace + '; return anonymous(locals);'+ tmpl.toString();
             fn = new Function('locals', fn);
             
             cb(null, {
@@ -99,9 +101,9 @@ module.exports = function(exportPath, patterns, options){
           , escape: jade.runtime.escape
           , dirname: utils.dirname
           , normalize: utils.normalize
-          , render: render(namespace)
+          , render: render((options.amd?'amd_':'')+namespace)
           , templates: templates
-        }, namespace, 'output');
+        }, namespace, 'output', amd);
         
         built = payload.exposed('output');
         
