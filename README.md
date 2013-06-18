@@ -1,5 +1,7 @@
 # Jade Browser
 
+[![Build Status](https://travis-ci.org/storify/jade-browser.png)](https://travis-ci.org/storify/jade-browser)
+
   Middleware for express/connect to expose jade templates to the web browser. It provides a few additional features like express-like render function with partial handling.
   
 ```javascript
