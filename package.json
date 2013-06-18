@@ -2,7 +2,7 @@
   "author": "Storify <dev@storify.com>",
   "name": "jade-browser",
   "description": "express/connect middleware that serves jade compiled templates to the browser",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "repository": {
     "url": "https://github.com/storify/jade-browser/"
   },
