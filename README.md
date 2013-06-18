@@ -50,6 +50,7 @@ app.use(jade_browser('/js/templates.js', '**', options));
   - `namespace` Namespace for the browser (default: 'jade')
   - `minify`    Minifies the output (default: false)
   - `maxAge`    Time in seconds to cache the results (default: 86400)
+  - `noCache`   Recompiles the output on every request (default: false)
   
 ### Browser
 
