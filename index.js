@@ -86,7 +86,7 @@ module.exports = function(exportPath, patterns, options){
       function expose(e, results) {
         var templates = {}, filename;
         results.forEach(function(template) {
-          filename = template.filename.replace(root + '/', '')
+          filename = path.relative(root, template.filename);
           templates[filename] = template.fn;
         });
 
