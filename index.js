@@ -51,7 +51,7 @@ module.exports = function(exportPath, patterns, options){
           files = files.concat(matches);
         } catch(e) {}
       });
-        
+
       async.map(files, getTemplate, expose);
 
       function getTemplate(filename, cb) {

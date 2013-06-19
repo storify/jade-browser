@@ -2,7 +2,7 @@
   "author": "Storify <api@storify.com>",
   "name": "jade-browser",
   "description": "express/connect middleware that serves jade compiled templates to the browser",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "repository": {
     "url": "https://github.com/storify/jade-browser/"
   },
@@ -18,7 +18,9 @@
   },
   "devDependencies": {
     "mocha": "1.11.0",
-    "expect.js": "0.2.0"
+    "expect.js": "0.2.0",
+    "express": "3.2.6",
+    "superagent": "0.14.9"
   },
   "scripts": {
     "test": "mocha test"

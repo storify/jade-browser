@@ -1,11 +1,24 @@
 # Jade Browser
 
+[![Jade Browser build status](https://travis-ci.org/storify/jade-browser.png)](https://travis-ci.org/storify/jade-browser)
+
+
   Middleware for express/connect to expose jade templates to the web browser. It provides a few additional features like express-like render function with partial handling.
   
 ```javascript
 var express = require('express')
   , jade_browser = require('jade-browser')
   , app = express.createServer();
+  
+app.use(jade_browser(url_endpoint, template_dir, options));
+```
+
+or for Express.js v3.x:
+
+```javascript
+var express = require('express')
+  , jade_browser = require('jade-browser')
+  , app = express();
   
 app.use(jade_browser(url_endpoint, template_dir, options));
 ```
@@ -30,6 +43,7 @@ app.use(jade_browser(url_endpoint, template_dir, options));
 ## Usage
 
 ### In Node.js
+
   As middleware jade-browser is simple to use.
 
 ```javascript
@@ -41,11 +55,13 @@ app.use(jade_browser('/js/templates.js', '**', options));
 ```
 
 ### Params
+
   - `filename`  The filename of the resulting compiled templates file
   - `patterns`  A single string or array of patterns used to glob for template files
   - `options`   Options object, see below (optional)
 
 #### Options
+
   - `root`      The root of the views (default: __dirname)
   - `namespace` Namespace for the browser (default: 'jade')
   - `minify`    Minifies the output (default: false)
@@ -70,15 +86,72 @@ Note: With render '.jade' extension is not required. Relative paths can be used 
 jade.render('path/../to/../test');
 ```
 
-## Credit
+## Credits
 
-  Large amounts of this code is inspired by TJ. Parts of express-expose and internal parts of express are recycled to make this happen.
+  Large amounts of this code is inspired by TJ. Parts of express-expose and internal parts of express are recycled to make this happen. Contibuting docs part is taken from [Mongoosastic](https://github.com/storify/mongoosastic/blob/master/readme.md).
 
 ## Contributors
 
-  * Nathan White ([nw](http://github.com/nw))
-  * Adrian Bravo ([adrianbravo](http://github.com/adrianbravo))
-  * Conner Petzold ([cpetzold](http://github.com/cpetzold))
+The list of contributors according to `git shortlog -s -n`:
+
+* 15  Conner Petzold ([cpetzold](http://github.com/cpetzold))
+* 12  Nathan White ([nw](http://github.com/nw))
+* 9  Azat Mardanov
+* 4  Patrick Forringer
+* 2  Vincent Battaglia
+* 2  Arlo Breault
+* 2  RashFael
+* 1  Adrian Bravo ([adrianbravo](http://github.com/adrianbravo))
+
+
+## Contributing
+
+Pull requests are always welcome as long as an accompanying test case is
+associated. 
+
+This project is configured to use [git
+flow](https://github.com/nvie/gitflow/) and the following conventions
+are used:
+
+* ``dev`` - represents current active development and can possibly be
+  unstable. 
+
+* ``master`` - pristine copy of repository, represents the currently
+  stable release found in the npm index.
+
+* ``feature/**`` - represents a new feature being worked on
+
+If you wish to contribute, the only requirement is to: 
+
+- branch a new feature branch from develop (if you're working on an
+  issue, prefix it with the issue number)
+- make the changes, with accompanying test cases
+- issue a pull request against develop branch
+
+Although I use git flow and prefix feature branches with "feature/" I
+don't require this for pull requests... all I care is that the feature
+branch name makes sense. 
+
+Pulls requests against master or pull requests branched from master will
+be rejected.
+
+#### Examples
+
+Examples of good branch names:
+
+* 12-amd-support
+* feature/12-amd-support
+
+
+### Running Tests
+
+In order to run the tests which are in `test` folder, you will need:
+
+* Node.js
+* NPM
+
+With those installed, running `npm install` and ''npm test'' will run the tests.
+
     
 ## License 
 
