@@ -18,6 +18,7 @@ module.exports = function(exportPath, patterns, options){
     , debug = options.debug || false
     , minify = options.minify || false
     , maxAge = options.maxAge || 86400
+    , reinherit = options.reinherit || false
     , exportPath = exportPath.replace(/\/$/,'')
     , root = path.normalize(options.root ? options.root.replace(/\/$/,'') : path.join(__dirname, '..', '..'))
     , regexp = utils.toRegExp(exportPath, true)
@@ -54,11 +55,23 @@ module.exports = function(exportPath, patterns, options){
 
       async.map(files, getTemplate, expose);
 
+      // Modify the templates being used to inherit from.
+      function alterExtends(content) {
+          return (content || '').replace(/^extends\ +(.*)$/m, function(s, m) {
+              return reinherit[m] ? 'extends '+ reinherit[m] :  s;
+          });
+      }
+
       function getTemplate(filename, cb) {
         
         fs.readFile(filename, 'utf8', function(err, content){
           if (err) {
             return cb(err);
+          }
+
+          // Override the templates being inherited from.
+          if (reinherit) {
+              content = alterExtends(content);
           }
 
           var tmpl = jade.compile(content, {
