@@ -11,9 +11,9 @@
     "node": ">= 0.4"
   },
   "dependencies": {
-    "jade": "0.20.3",
     "async": "0.1.18",
     "glob": "3.1.7",
+    "jade": "^1.7.0",
     "uglify-js": "1.2.5"
   },
   "devDependencies": {
