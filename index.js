@@ -60,6 +60,10 @@ module.exports = function(exportPath, patterns, options){
           if (err) {
             return cb(err);
           }
+          
+          if (options.beforeCompile && typeof options.beforeCompile == 'function') {
+            var content = options.beforeCompile( content );
+          }
 
           var tmpl = jade.compile(content, {
               filename: filename
