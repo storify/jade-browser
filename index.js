@@ -37,12 +37,14 @@ module.exports = function(exportPath, patterns, options){
     } else {
       
       if (typeof patterns == 'string') {
-        patterns = [patterns];
+        patterns = [ patterns ];
       }
       
       var files = [];
       patterns.forEach(function(pattern) {
-        pattern = path.join(root, pattern);
+        
+        pattern = path.join(root, pattern) + '/**';
+        
         try {
           var matches = glob.sync(pattern);
           matches = matches.filter(function(match) {
@@ -52,7 +54,7 @@ module.exports = function(exportPath, patterns, options){
         } catch(e) {}
       });
 
-      async.map(files, getTemplate, expose);
+      async.map( files , getTemplate , expose );
 
       function getTemplate(filename, cb) {
         
@@ -65,30 +67,26 @@ module.exports = function(exportPath, patterns, options){
             var content = options.beforeCompile( content );
           }
 
-          var tmpl = jade.compile(content, {
+          var tmpl = jade.compileClient(content, {
               filename: filename
             , inline: false
             , compileDebug: false
-            , client: true
           });
           
-          if (typeof tmpl == 'function') {
-            var fn = 'var jade=window.' + namespace + '; return anonymous(locals);'+ tmpl.toString();
-            fn = new Function('locals', fn);
-            
-            cb(null, {
-                filename: filename
-              , fn: fn
-            });
-          } else {
-            cb(new Error('Failed to compile'));
-          }
+          var fn = 'var jade=window.' + namespace + ';return template(locals);'+ tmpl.toString();
+          fn = new Function('locals', fn );
+
+          cb(null, {
+              filename: filename
+            , fn: fn
+          });
           
         }); 
       }
 
       function expose(e, results) {
         var templates = {}, filename;
+
         results.forEach(function(template) {
           filename = path.relative(root, template.filename);
           templates[filename] = template.fn;
