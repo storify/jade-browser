@@ -11,16 +11,16 @@
     "node": ">= 0.4"
   },
   "dependencies": {
-    "async": "^1.5.2",
-    "glob": "^6.0.4",
-    "jade": "^1.11.0",
-    "uglify-js": "^2.6.1"
+    "async": "1.5.2",
+    "glob": "6.0.4",
+    "jade": "1.11.0",
+    "uglify-js": "2.6.1"
   },
   "devDependencies": {
-    "expect.js": "^0.3.1",
-    "express": "^4.13.4",
-    "mocha": "^2.4.4",
-    "superagent": "^1.7.2"
+    "expect.js": "0.3.1",
+    "express": "4.13.4",
+    "mocha": "2.4.4",
+    "superagent": "1.7.2"
   },
   "scripts": {
     "test": "mocha test"
