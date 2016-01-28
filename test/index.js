@@ -17,7 +17,7 @@ describe("jade browser", function(){
   it('create an object', function(done){
 
     expect(app).to.exist;
-    superagent.get('http://localhost:3003/template.js').end(function(res){
+    superagent.get('http://localhost:3003/template.js').end(function(err,res){
       expect(res.status).to.equal(200);
       expect(res.text.toString()).to.contain('<h1>test</h1>');
       expect(res.text.toString()).to.contain('test/template/test.jade"');

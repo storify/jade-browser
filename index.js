@@ -61,26 +61,19 @@ module.exports = function(exportPath, patterns, options){
             return cb(err);
           }
 
-          var tmpl = jade.compile(content, {
+          var tmpl = jade.compileClient(content, {
               filename: filename
-            , inline: false
             , compileDebug: false
-            , client: true
           });
-          
-          if (typeof tmpl == 'function') {
-            var fn = 'var jade=window.' + namespace + '; return anonymous(locals);'+ tmpl.toString();
+
+            var fn = 'var jade=window.' + namespace + '; return anonymous(locals);'+ tmpl;
             fn = new Function('locals', fn);
-            
+
             cb(null, {
                 filename: filename
               , fn: fn
             });
-          } else {
-            cb(new Error('Failed to compile'));
-          }
-          
-        }); 
+        });
       }
 
       function expose(e, results) {
