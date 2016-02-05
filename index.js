@@ -66,7 +66,7 @@ module.exports = function(exportPath, patterns, options){
             , compileDebug: false
           });
 
-            var fn = 'var jade=window.' + namespace + '; return anonymous(locals);'+ tmpl;
+            var fn = 'var jade=window.' + namespace + '; return template(locals); '+ tmpl;
             fn = new Function('locals', fn);
 
             cb(null, {
