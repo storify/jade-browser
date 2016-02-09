@@ -2,11 +2,13 @@ var express = require('express'),
   path = require('path'),
   jade_browser = require('../index.js'),
   expect = require('expect.js'),
-  superagent = require('superagent'),
+    superagent = require('superagent'),
+    vm = require('vm'),
+    util = require('util'),
   app;
 
 describe("jade browser", function(){
-  
+
   before(function(done){
     app = express();
     app.use(jade_browser('/template.js', path.join('template', '**'), {
@@ -26,5 +28,16 @@ describe("jade browser", function(){
       done();
     });
   });
+    it('renders an object', function(done){
+       superagent.get('http://localhost:3003/template.js').end(function(err,res){
+           var s = new vm.Script(res.text.toString());
+           var c = new vm.createContext({});
+           s.runInContext(c);
+           var f = c.jade.templates['template/test.jade'];
+           expect(f()).to.equal('<h1>test</h1>');
+           done();
+    });
+
+    });
 
 });
