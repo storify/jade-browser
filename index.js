@@ -24,7 +24,8 @@ module.exports = function(exportPath, patterns, options){
     , headers = {
           'Cache-Control': 'public, max-age=' + maxAge
         , 'Content-Type': 'text/javascript'
-    };
+    }
+    , preprocess = options.preprocess || function(n,callback){callback(null,n);};
 
     var runtime = 'var ' + namespace + ' = {};\n' ;
 
@@ -63,7 +64,7 @@ module.exports = function(exportPath, patterns, options){
         } catch(e) {}
       });
 
-      async.map(files, getTemplate, expose);
+        async.map(files, async.compose(getTemplate,preprocess), expose);
 
       function getTemplate(filename, cb) {
         

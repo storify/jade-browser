@@ -40,4 +40,26 @@ describe("jade browser", function(){
 
     });
 
+    it('allows a preprocess option', function(done){
+        app = express();
+        app.use(jade_browser('/template2.js', path.join('template', '**'), {
+            root: __dirname // Only necessary because we are not using this from node_modules
+          , preprocess: function(template,callback){
+                template += '\n h2 test2';
+                callback(null,template);
+            }
+        }));
+        app.listen(3004);
+        expect(app).to.exist;
+        superagent.get('http://localhost:3004/template2.js').end(function(err,res){
+      expect(res.status).to.equal(200);
+      expect(res.text.toString()).to.contain('<h1>test</h1>');
+      expect(res.text.toString()).to.contain('<h2>test2</h2>');
+      expect(res.text.toString()).to.contain('template/test.jade"');
+
+    });
+        done();
+    });
+
+
 });
