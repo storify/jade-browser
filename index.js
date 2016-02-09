@@ -23,8 +23,19 @@ module.exports = function(exportPath, patterns, options){
     , regexp = utils.toRegExp(exportPath, true)
     , headers = {
           'Cache-Control': 'public, max-age=' + maxAge
-        , 'Content-Type': 'text/javascript' 
-      };
+        , 'Content-Type': 'text/javascript'
+    };
+
+    var runtime = 'var ' + namespace + ' = {};\n' ;
+
+    fs.readFile('node_modules/jade/runtime.js', 'utf8', function(err, content){
+          if (err) {
+              throw(err);
+          }
+
+          runtime += content.replace(/exports\./g,namespace + '.');
+          runtime += '\n\n'
+        });
 
   return function(req, res, next){
     if (!req.url.match(regexp)) {
@@ -77,28 +88,23 @@ module.exports = function(exportPath, patterns, options){
       }
 
       function expose(e, results) {
-        var templates = {}, filename;
+          var templates = {}, filename;
         results.forEach(function(template) {
           filename = path.relative(root, template.filename).replace(/\\/g, '/');
           templates[filename] = template.fn;
         });
 
-        var code = jade.runtime.escape.toString() +';'
-        code += jade.runtime.attrs.toString().replace(/exports\./g, '') + ';'
-        code += ' return attrs(obj);'
-        
+
+
+
+
         var payload = new Expose();
         payload.expose({
-            attrs: new Function('obj', code)
-          , escape: jade.runtime.escape
-          , dirname: utils.dirname
-          , normalize: utils.normalize
-          , render: render(namespace)
-          , templates: templates
+           templates: templates
         }, namespace, 'output');
-        
-        built = payload.exposed('output');
-        
+
+        var built =  runtime + payload.exposed('output');
+
         if (minify) {
           var code = parser.parse(built);
           code = compiler.ast_mangle(code);
