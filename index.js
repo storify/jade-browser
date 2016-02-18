@@ -25,7 +25,7 @@ module.exports = function(exportPath, patterns, options){
           'Cache-Control': 'public, max-age=' + maxAge
         , 'Content-Type': 'text/javascript'
     }
-    , preprocess = options.preprocess || function(n,callback){callback(null,n);};
+    , preprocess = options.preprocess || function(template){return template;};
 
     var runtime = 'var ' + namespace + ' = {};\n' ;
 
@@ -64,18 +64,19 @@ module.exports = function(exportPath, patterns, options){
         } catch(e) {}
       });
 
-        async.map(files, async.compose(getTemplate,preprocess), expose);
+        async.map(files, getTemplate, expose);
 
       function getTemplate(filename, cb) {
-        
+
         fs.readFile(filename, 'utf8', function(err, content){
           if (err) {
             return cb(err);
           }
+            var transformedContent = preprocess(content);
 
-          var tmpl = jade.compileClient(content, {
-              filename: filename
-            , compileDebug: false
+            var tmpl = jade.compileClient(transformedContent,
+                                          {filename: filename,
+                                           compileDebug: false
           });
 
             var fn = 'var jade=window.' + namespace + '; return template(locals); '+ tmpl;

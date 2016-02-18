@@ -1,13 +1,14 @@
 var express = require('express'),
-  path = require('path'),
-  jade_browser = require('../index.js'),
-  expect = require('expect.js'),
+    path = require('path'),
+    jade_browser = require('../index.js'),
+    expect = require('expect.js'),
     superagent = require('superagent'),
     vm = require('vm'),
-    util = require('util'),
-  app;
+    app;
 
 describe("jade browser", function(){
+    this.timeout(10000);
+    this.slow(8000);
 
   before(function(done){
     app = express();
@@ -19,7 +20,7 @@ describe("jade browser", function(){
     });
   });
 
-  it('create an object', function(done){
+  it('creates an object', function(done){
     expect(app).to.exist;
     superagent.get('http://localhost:3003/template.js').end(function(err,res){
       expect(res.status).to.equal(200);
@@ -44,21 +45,21 @@ describe("jade browser", function(){
         app = express();
         app.use(jade_browser('/template2.js', path.join('template', '**'), {
             root: __dirname // Only necessary because we are not using this from node_modules
-          , preprocess: function(template,callback){
-                template += '\n h2 test2';
-                callback(null,template);
+          , preprocess: function(template){
+                return template += '\nh2 test2';
             }
         }));
         app.listen(3004);
         expect(app).to.exist;
         superagent.get('http://localhost:3004/template2.js').end(function(err,res){
-      expect(res.status).to.equal(200);
-      expect(res.text.toString()).to.contain('<h1>test</h1>');
-      expect(res.text.toString()).to.contain('<h2>test2</h2>');
-      expect(res.text.toString()).to.contain('template/test.jade"');
+            expect(res.status).to.equal(200);
+            expect(res.text.toString()).to.contain('<h1>test</h1>');
+            expect(res.text.toString()).to.contain('<h2>test2</h2>');
+            expect(res.text.toString()).to.contain('template/test.jade"');
+            done();
 
     });
-        done();
+
     });
 
 
