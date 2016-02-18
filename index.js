@@ -19,12 +19,24 @@ module.exports = function(exportPath, patterns, options){
     , minify = options.minify || false
     , maxAge = options.maxAge || 86400
     , exportPath = exportPath.replace(/\/$/,'')
-    , root = path.normalize(options.root ? options.root.replace(/\/$/,'') : __dirname)
+    , root = path.normalize(options.root ? options.root.replace(/\/$/,'') : path.join(__dirname, '..', '..'))
     , regexp = utils.toRegExp(exportPath, true)
     , headers = {
           'Cache-Control': 'public, max-age=' + maxAge
-        , 'Content-Type': 'text/javascript' 
-      };
+        , 'Content-Type': 'text/javascript'
+    }
+    , preprocess = options.preprocess || function(template){return template;};
+
+    var runtime = 'var ' + namespace + ' = {};\n' ;
+
+    fs.readFile('node_modules/jade/runtime.js', 'utf8', function(err, content){
+          if (err) {
+              throw(err);
+          }
+
+          runtime += content.replace(/exports\./g,namespace + '.');
+          runtime += '\n\n'
+        });
 
   return function(req, res, next){
     if (!req.url.match(regexp)) {
@@ -52,60 +64,49 @@ module.exports = function(exportPath, patterns, options){
         } catch(e) {}
       });
 
-      async.map(files, getTemplate, expose);
+        async.map(files, getTemplate, expose);
 
       function getTemplate(filename, cb) {
-        
+
         fs.readFile(filename, 'utf8', function(err, content){
           if (err) {
             return cb(err);
           }
+            var transformedContent = preprocess(content);
 
-          var tmpl = jade.compile(content, {
-              filename: filename
-            , inline: false
-            , compileDebug: false
-            , client: true
+            var tmpl = jade.compileClient(transformedContent,
+                                          {filename: filename,
+                                           compileDebug: false
           });
-          
-          if (typeof tmpl == 'function') {
-            var fn = 'var jade=window.' + namespace + '; return anonymous(locals);'+ tmpl.toString();
+
+            var fn = 'var jade=window.' + namespace + '; return template(locals); '+ tmpl;
             fn = new Function('locals', fn);
-            
+
             cb(null, {
                 filename: filename
               , fn: fn
             });
-          } else {
-            cb(new Error('Failed to compile'));
-          }
-          
-        }); 
+        });
       }
 
       function expose(e, results) {
-        var templates = {}, filename;
+          var templates = {}, filename;
         results.forEach(function(template) {
           filename = path.relative(root, template.filename).replace(/\\/g, '/');
           templates[filename] = template.fn;
         });
 
-        var code = jade.runtime.escape.toString() +';'
-        code += jade.runtime.attrs.toString().replace(/exports\./g, '') + ';'
-        code += ' return attrs(obj);'
-        
+
+
+
+
         var payload = new Expose();
         payload.expose({
-            attrs: new Function('obj', code)
-          , escape: jade.runtime.escape
-          , dirname: utils.dirname
-          , normalize: utils.normalize
-          , render: render(namespace)
-          , templates: templates
+           templates: templates
         }, namespace, 'output');
-        
-        built = payload.exposed('output');
-        
+
+        var built =  runtime + payload.exposed('output');
+
         if (minify) {
           var code = parser.parse(built);
           code = compiler.ast_mangle(code);
