@@ -1,10 +1,10 @@
 {
   "author": "Storify <api@storify.com>",
-  "name": "jade-browser",
-  "description": "express/connect middleware that serves jade compiled templates to the browser",
+  "name": "pug-browser",
+  "description": "express/connect middleware that serves pug compiled templates to the browser",
   "version": "0.0.14",
   "repository": {
-    "url": "https://github.com/storify/jade-browser/"
+    "url": "https://github.com/MC-Escherichia/pug-browser/"
   },
   "main": "./index.js",
   "engines": {
@@ -13,7 +13,8 @@
   "dependencies": {
     "async": "1.5.2",
     "glob": "6.0.4",
-    "jade": "1.11.0",
+    "pug": "^0.1.0",
+    "pug-runtime": "^2.0.0",
     "uglify-js": "2.6.1"
   },
   "devDependencies": {
