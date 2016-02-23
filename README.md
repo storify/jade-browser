@@ -1,35 +1,39 @@
-# Jade Browser
+# Pug Browser
 
-[![Jade Browser build status](https://travis-ci.org/storify/jade-browser.png)](https://travis-ci.org/storify/jade-browser)
+[![Pug Browser build status](https://travis-ci.org/MC-Escherichia/pug-browser.png)](https://travis-ci.org/MC-Escherichia/pug-browser)
 
 
-  Middleware for express/connect to expose jade templates to the web browser. It provides a few additional features like express-like render function with partial handling.
+  Middleware for express/connect to expose pug templates to the web browser. It provides a few additional features like express-like render function with partial handling.
+  
+  This work is a continuation of the [Storify/jade-browser](https://github.com/storify/jade-browser) project updated according to the namechange of jade to pug. See [Renaming jade -> Pug](https://github.com/pugjs/jade/issues/2184). If any owner of that project wants to reclaim it, I will be happy to find some arrangement. 
+  
+  
   
 ```javascript
 var express = require('express')
-  , jade_browser = require('jade-browser')
+  , pug_browser = require('pug-browser')
   , app = express.createServer();
   
-app.use(jade_browser(url_endpoint, template_dir, options));
+app.use(pug_browser(url_endpoint, template_dir, options));
 ```
 
 or for Express.js v3.x:
 
 ```javascript
 var express = require('express')
-  , jade_browser = require('jade-browser')
+  , pug_browser = require('pug-browser')
   , app = express();
   
-app.use(jade_browser(url_endpoint, template_dir, options));
+app.use(pug_browser(url_endpoint, template_dir, options));
 ```
 
 ## Installation
 
-    $ npm install jade-browser
+    $ npm install pug-browser
   
 ## Features
 
-  * Jade templates are served as compiled functions.
+  * Pug templates are served as compiled functions.
     * removes browser compatibility issues
     * increases speed of template execution
     * reduces file transfer size
@@ -44,14 +48,14 @@ app.use(jade_browser(url_endpoint, template_dir, options));
 
 ### In Node.js
 
-  As middleware jade-browser is simple to use.
+  As middleware pug-browser is simple to use.
 
 ```javascript
 var express = require('express')
-  , jade_browser = require('jade-browser')
+  , pug_browser = require('pug-browser')
   , app = express.createServer();
 
-app.use(jade_browser('/js/templates.js', '**', options));
+app.use(pug_browser('/js/templates.js', '**', options));
 ```
 
 ### Params
@@ -63,7 +67,7 @@ app.use(jade_browser('/js/templates.js', '**', options));
 #### Options
 
   - `root`      The root of the views (default: __dirname)
-  - `namespace` Namespace for the browser (default: 'jade')
+  - `namespace` Namespace for the browser (default: 'pug')
   - `minify`    Minifies the output (default: false)
   - `maxAge`    Time in seconds to cache the results (default: 86400)
   - `noCache`   Recompiles the output on every request (default: false)
@@ -71,19 +75,19 @@ app.use(jade_browser('/js/templates.js', '**', options));
 ### Browser
 
 ```javascript
-jade.render('path/to/template', { values: for_template });
+pug.render('path/to/template', { values: for_template });
 ```
     
 For direct access (for templates that have no need for partials).
 
 ```javascript
-jade.templates['path/to/template.jade'](locals);
+pug.templates['path/to/template.pug'](locals);
 ```
     
-Note: With render '.jade' extension is not required. Relative paths can be used in templates and in render function.
+Note: With render '.pug' extension is not required. Relative paths can be used in templates and in render function.
 
 ```javascript
-jade.render('path/../to/../test');
+pug.render('path/../to/../test');
 ```
 
 ## Credits
