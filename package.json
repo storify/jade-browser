@@ -2,7 +2,7 @@
   "author": "Storify <api@storify.com>",
   "name": "pug-browser",
   "description": "express/connect middleware that serves pug compiled templates to the browser",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "repository": {
     "url": "https://github.com/MC-Escherichia/pug-browser/"
   },
