@@ -1,18 +1,21 @@
 var fs = require('fs')
   , path = require('path')
-  , jade = require('jade')
+  , pug = require('pug')
   , async = require('async')
+  , qs = require('querystring')
   , glob = require('glob')
+  , JSON = require('JSON')
+  , wrap = require('pug-runtime/wrap')
+	, runtime = require('pug-runtime')
   , parser = require('uglify-js').parser
   , compiler = require('uglify-js').uglify
   , Expose = require('./lib/expose')
-  , render = require('./lib/render').render
   , utils = require('./lib/utils');
 
 module.exports = function(exportPath, patterns, options){
   var options = options || {}
-    , ext = options.ext || 'jade'
-    , namespace = options.namespace || 'jade'
+    , ext = options.ext || 'pug'
+    , namespace = options.namespace || 'pug'
     , built = false
     , noCache = options.noCache || false
     , debug = options.debug || false
@@ -27,31 +30,21 @@ module.exports = function(exportPath, patterns, options){
     }
     , preprocess = options.preprocess || function(template){return template;};
 
-    var runtime = 'var ' + namespace + ' = {};\n' ;
-
-    fs.readFile('node_modules/jade/runtime.js', 'utf8', function(err, content){
-          if (err) {
-              throw(err);
-          }
-
-          runtime += content.replace(/exports\./g,namespace + '.');
-          runtime += '\n\n'
-        });
 
   return function(req, res, next){
     if (!req.url.match(regexp)) {
        return next();
     }
-    
+
     if (built && !noCache) {
       res.writeHead(200, headers);
       res.end(built);
     } else {
-      
+
       if (typeof patterns == 'string') {
         patterns = [patterns];
       }
-      
+
       var files = [];
       patterns.forEach(function(pattern) {
         pattern = path.join(root, pattern);
@@ -64,48 +57,50 @@ module.exports = function(exportPath, patterns, options){
         } catch(e) {}
       });
 
-        async.map(files, getTemplate, expose);
 
-      function getTemplate(filename, cb) {
 
-        fs.readFile(filename, 'utf8', function(err, content){
-          if (err) {
-            return cb(err);
-          }
-            var transformedContent = preprocess(content);
+      var getTemplate = function(filename, cb) {
 
-            var tmpl = jade.compileClient(transformedContent,
+          fs.readFile(filename, 'ascii', function(err, content){
+              if (err) {
+                  return cb(err);
+              }
+              var transformedContent = preprocess(content);
+
+              var tmpl = pug.compileClient(transformedContent,
                                           {filename: filename,
-                                           compileDebug: false
-          });
+                                           compileDebug: debug,
+                                           pretty: true,
+                                           externalRuntime: true,
+                                           //  inlineRuntimeFunctions: true
+                                          });
 
-            var fn = 'var jade=window.' + namespace + '; return template(locals); '+ tmpl;
-            fn = new Function('locals', fn);
+              var fn = wrap(tmpl);
 
             cb(null, {
-                filename: filename
-              , fn: fn
+                filename: filename,
+                fn: fn
             });
         });
-      }
+      };
 
-      function expose(e, results) {
+      var expose = function(e, results) {
           var templates = {}, filename;
         results.forEach(function(template) {
           filename = path.relative(root, template.filename).replace(/\\/g, '/');
           templates[filename] = template.fn;
         });
 
+          runtime.templates = templates;
+
+          var payload = new Expose();
+
+          payload.expose(runtime,namespace,'output');
 
 
-
-
-        var payload = new Expose();
-        payload.expose({
-           templates: templates
-        }, namespace, 'output');
-
-        var built =  runtime + payload.exposed('output');
+          var built = 'var ' + namespace + ' = {};';
+          built += payload.exposed('output');
+          built = renderUnicode(built);
 
         if (minify) {
           var code = parser.parse(built);
@@ -116,8 +111,20 @@ module.exports = function(exportPath, patterns, options){
 
         res.writeHead(200, headers);
         res.end(built);
-      }
-      
+      };
+
+      async.map(files, getTemplate, expose);
     }
-  }
+
+  };
+};
+
+
+function renderUnicode(s){
+    var re = /\\u([\d\w]{4})/gi;
+    s = s.replace(re,function(match,grp){
+        return String.fromCharCode(parseInt(grp,16));
+    });
+    return  qs.unescape(s);
+
 }
