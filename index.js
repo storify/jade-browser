@@ -4,7 +4,6 @@ var fs = require('fs')
   , async = require('async')
   , qs = require('querystring')
   , glob = require('glob')
-  , JSON = require('JSON')
   , wrap = require('pug-runtime/wrap')
 	, runtime = require('pug-runtime')
   , parser = require('uglify-js').parser
